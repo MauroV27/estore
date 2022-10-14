@@ -7,7 +7,7 @@ Para executar o código é necessário usar o comando : `npm install`
 
 ### 2. Carregar o esquema do banco de dados em um servidor postgress
 Para isso é necessário:
-1. Abrir o arquivo [ecommerce.sql](ecommerce.sql) em um gerenciador de banco de dados, como PgAdim.
+1. Abrir o arquivo [ecommerce.sql](https://github.com/MauroV27/estore/blob/main/ecommerce.sql) em um gerenciador de banco de dados, como PgAdim.
 2. Criar um arquivo .env na pasta raiz e colocar o valor DATABASE_URL da seguinte forma, subtituindo os campos de acordo com os valores do servidor postgres: 
 ```enviroment
 DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=SCHEMA"
