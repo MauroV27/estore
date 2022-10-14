@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Categoria {
+  id                Int                 @id @default(autoincrement())
+  descricao         String              @db.VarChar
+  categoria_produto CategoriaProduto[]
+
+  @@map("categoria")
+}
+
+model CategoriaProduto {
+  categoriaId Int       @default(autoincrement()) @map("categoria_id")
+  produtoId   Int       @default(autoincrement()) @map("produto_id")
+  categoria    Categoria @relation(fields: [categoriaId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "categoria_id")
+  produto      Produto   @relation(fields: [produtoId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "produto_id")
+
+  @@id([categoriaId, produtoId])
+  @@map("categoria_produto")
+}
+
+model Produto {
+  id                Int                 @id @default(autoincrement())
+  descricao         String              @db.VarChar
+  preco             Float
+  foto              String              @db.VarChar
+  quantidade        Int
+  categoria_produto CategoriaProduto[]
+  venda_produto     VendaProduto[]
+
+  @@map("produto")
+}
+
+model Usuario {
+  id            Int     @id @default(autoincrement())
+  administrador Boolean
+  nome          String  @db.VarChar
+  endereco      String  @db.VarChar
+  email         String  @db.VarChar
+  login         String  @db.VarChar
+  senha         String  @db.VarChar
+  venda         Venda[]
+
+  @@map("usuario")
+}
+
+model Venda {
+  id            Int             @id @default(autoincrement())
+  dataHora      DateTime        @db.Timestamp(6) @map("data_hora")
+  usuarioId     Int             @default(autoincrement()) @map("usuario_id")
+  usuario       Usuario         @relation(fields: [usuarioId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "usuario_id")
+  venda_produto VendaProduto[]
+
+  @@map("venda")
+}
+
+model VendaProduto {
+  vendaId    Int     @default(autoincrement()) @map("venda_id")
+  produtoId  Int     @default(autoincrement()) @map("produto_id")
+  quantidade Int
+  produto    Produto @relation(fields: [produtoId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "produto_id")
+  venda      Venda   @relation(fields: [vendaId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "venda_id")
+
+  @@id([vendaId, produtoId])
+  @@map("venda_produto")
+}
