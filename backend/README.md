@@ -20,5 +20,5 @@ Esse backend não contêm nenhum elemento de view, dessa forma a melhor forma de
 ## Executando o código
 
 ```terminal
-npm startDev
+npm run startDev
 ```
