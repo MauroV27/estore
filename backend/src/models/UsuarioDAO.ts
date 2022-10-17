@@ -32,7 +32,9 @@ export class UsuarioDAO {
       },
     });
 
-    console.log("Get user: ", getUser);
-    return response.json(getUser);
+    const {senha, ...clientData} = {...getUser};
+
+    console.log("Get user: ", clientData);
+    return response.json(clientData);
   }
 }
