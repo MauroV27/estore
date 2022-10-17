@@ -4,7 +4,7 @@ import { PrismaClient, Usuario } from "@prisma/client";
 const prismaClient = new PrismaClient();
 
 export class UsuarioDAO {
-  async create(request: Request, response: Response) {
+  public async create(request: Request, response: Response) {
     const { nome, email, senha, endereco, login } = request.body;
 
     const createUser = await prismaClient.usuario.create({
@@ -18,13 +18,12 @@ export class UsuarioDAO {
       },
     });
 
-
     console.log("Create user in database: ", createUser);
     
-    return response.json(this.hideSensitiveDataForResponse(createUser));
+    return response.json({id:createUser.id, nome, email, login});
   }
 
-  async get(request: Request, response: Response) {
+  public async get(request: Request, response: Response) {
     const { id } = request.body;
 
     const getUser = await prismaClient.usuario.findFirst({
@@ -36,7 +35,7 @@ export class UsuarioDAO {
     if ( getUser == null ){
       return response.status(500).send("Usuario não encontrado")
     } else {
-      const clientData = this.hideSensitiveDataForResponse(getUser);
+      const {senha, ...clientData} = {...getUser};
 
       console.log("Get user: ", clientData);
       return response.json(clientData);
