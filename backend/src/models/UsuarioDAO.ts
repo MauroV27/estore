@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Usuario } from "@prisma/client";
 
 const prismaClient = new PrismaClient();
 
@@ -19,8 +19,9 @@ export class UsuarioDAO {
     });
 
 
-    console.log("Create user: ", createUser);
-    return response.json(createUser);
+    console.log("Create user in database: ", createUser);
+    
+    return response.json(this.hideSensitiveDataForResponse(createUser));
   }
 
   async get(request: Request, response: Response) {
@@ -32,9 +33,18 @@ export class UsuarioDAO {
       },
     });
 
-    const {senha, ...clientData} = {...getUser};
+    if ( getUser == null ){
+      return response.status(500).send("Usuario não encontrado")
+    } else {
+      const clientData = this.hideSensitiveDataForResponse(getUser);
 
-    console.log("Get user: ", clientData);
-    return response.json(clientData);
+      console.log("Get user: ", clientData);
+      return response.json(clientData);
+    }
+  }
+
+  private hideSensitiveDataForResponse(user:Usuario) : Object{
+    const {senha, ...publicData} = {...user}; 
+    return publicData;
   }
 }
