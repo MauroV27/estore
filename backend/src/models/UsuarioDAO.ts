@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
-import { PrismaClient, Usuario } from "@prisma/client";
+import PrismaConnect from '../db/prismaConnect';
 
-const prismaClient = new PrismaClient();
+const prisma = PrismaConnect.getInstance();
 
 export class UsuarioDAO {
   public async create(request: Request, response: Response) {
     const { nome, email, senha, endereco, login } = request.body;
 
-    const createUser = await prismaClient.usuario.create({
+    const createUser = await prisma.usuario.create({
       data: {
         nome,
         administrador : false,
@@ -26,7 +26,7 @@ export class UsuarioDAO {
   public async get(request: Request, response: Response) {
     const { id } = request.body;
 
-    const getUser = await prismaClient.usuario.findFirst({
+    const getUser = await prisma.usuario.findFirst({
       where: {
         id,
       },
@@ -42,8 +42,4 @@ export class UsuarioDAO {
     }
   }
 
-  private hideSensitiveDataForResponse(user:Usuario) : Object{
-    const {senha, ...publicData} = {...user}; 
-    return publicData;
-  }
 }
