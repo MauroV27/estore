@@ -6,7 +6,7 @@ const prisma = PrismaConnect.getInstance();
 
 export class CategoriaDAO {
 
-    public async createCategory(request: Request, response: Response) {
+    public async create(request: Request, response: Response) {
         const { descricao } = request.body;
 
         const createCategory = await prisma.categoria.create({ 
@@ -19,7 +19,7 @@ export class CategoriaDAO {
         
     }
     
-    public async updateCategory(request: Request, response: Response) {
+    public async update(request: Request, response: Response) {
         const { id, nova_descricao } = request.body;
 
             const updateCategory = await prisma.categoria.update({
@@ -35,19 +35,19 @@ export class CategoriaDAO {
         
     }
 
-    public async removeCategory(request: Request, response: Response) {
+    public async delete(request: Request, response: Response) {
         const { id } = request.body;
 
-        const removedCategory = await prisma.categoria.delete({ 
+        const deleteCategory = await prisma.categoria.delete({ 
             where : {
                 id: id,
             },
         });
         
-        return response.json({removedCategory});
+        return response.json({deleteCategory});
     }
 
-    public async getCategoryDataByID(request: Request, response: Response) {
+    public async get(request: Request, response: Response) {
         const { id } = request.body;
 
         const getCategory = await prisma.categoria.findMany({
