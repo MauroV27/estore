@@ -18,67 +18,89 @@ interface ProductResponse {
 
 export class ProdutoDAO {
 
-    public async createProduct(request: Request, response: Response) {
+    public async create(request: Request, response: Response) {
         const { descricao, preco, foto, quantidade } = request.body;
 
-        const {status, message, result} : ProductResponse = this.validateDataForCreateProduct(descricao, preco, foto, quantidade);
+        // const {status, message, result} : ProductResponse = this.validateDataForCreateProduct(descricao, preco, foto, quantidade);
 
-        if ( result == undefined ){
-            return response.json({status, message})
-        } else {
-            const createProduct = await prisma.produto.create({ 
-                data: {
-                    descricao : result.descricao, 
-                    preco : result.preco, 
-                    foto : result.foto,
-                    quantidade : result.quantidade,
-                }});
+        // if ( result == undefined ){
+        //     return response.json({status, message})
+        // } else {
+        // [ISSUE] : Data used to create product is not validate
+        const createProduct = await prisma.produto.create({ 
+            data: {
+                descricao : descricao, 
+                preco : preco, 
+                foto : foto,
+                quantidade : quantidade,
+            }});
         
-            
-            return response.json({createProduct});
-        }
+        return response.json({createProduct});
+        // }
         
     }
     
-    public async updateProduct(request: Request, response: Response) {
+    public async update(request: Request, response: Response) {
         const { id, descricao, preco, foto, quantidade } = request.body;
 
-        const {status, message, result} : ProductResponse = this.validateDataForCreateProduct(descricao, preco, foto, quantidade);
+        // const {status, message, result} : ProductResponse = this.validateDataForCreateProduct(descricao, preco, foto, quantidade);
 
-        if ( result == undefined ){
-            return response.json({status, message})
-        } else {
-            const updateProduct = await prisma.produto.update({ 
-                where : {
-                    id,
-                },
-                data: {
-                    descricao : result.descricao, 
-                    preco : result.preco, 
-                    foto : result.foto,
-                    quantidade : result.quantidade,
-                },
-            });
-        
+        // if ( result == undefined ){
+        //     return response.json({status, message})
+        // } else {
             
-            return response.json({id:updateProduct.id});
-        }
+        // [ISSUE] : id can not exist in db
+        // [ISSUE] : Data used to update product is not validate
+        const updateProduct = await prisma.produto.update({ 
+            where : {
+                id,
+            },
+            data: {
+                descricao : descricao, 
+                preco : preco, 
+                foto : foto,
+                quantidade : quantidade,
+            },
+        });
+        
+        return response.json({id:updateProduct.id});
+        // }
     }
 
-    public async removeProduct(request: Request, response: Response) {
+    public async delete(request: Request, response: Response) {
         const { id } = request.body;
 
-        const removedProduct = await prisma.produto.delete({ 
+        const productExists = await prisma.produto.findUnique({
+            where: {
+                id
+            }
+        })
+    
+        if ( productExists == null ){
+            return response.json({"status": "failed", "messgae": "Product not exist."})
+        }
+
+        const deletedProduct = await prisma.produto.delete({ 
             where : {
                 id: id,
             },
         });
         
-        return response.json({removedProduct});
+        return response.json({deletedProduct});
     }
 
-    public async getProductDataByID(request: Request, response: Response) {
+    public async get(request: Request, response: Response) {
         const { id } = request.body;
+
+        const productExists = await prisma.produto.findUnique({
+            where: {
+                id
+            }
+        })
+    
+        if ( productExists == null ){
+            return response.json({"status": "failed", "messgae": "Product not exist."})
+        }
 
         const getProduct = await prisma.produto.findFirst({
           where: {
