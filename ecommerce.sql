@@ -5,7 +5,7 @@
 -- Dumped from database version 14.4
 -- Dumped by pg_dump version 14.4
 
--- Started on 2022-10-13 20:24:35
+-- Started on 2022-11-13 14:07:30
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -29,7 +29,8 @@ SET default_table_access_method = heap;
 
 CREATE TABLE public.categoria (
     id integer NOT NULL,
-    descricao character varying NOT NULL
+    descricao character varying NOT NULL,
+    nome character varying NOT NULL
 );
 
 
@@ -103,7 +104,8 @@ CREATE TABLE public.produto (
     descricao character varying NOT NULL,
     preco double precision NOT NULL,
     foto character varying NOT NULL,
-    quantidade integer NOT NULL
+    quantidade integer NOT NULL,
+    nome character varying NOT NULL
 );
 
 
@@ -344,7 +346,7 @@ ALTER TABLE ONLY public.venda_produto
     ADD CONSTRAINT venda_id FOREIGN KEY (venda_id) REFERENCES public.venda(id) NOT VALID;
 
 
--- Completed on 2022-10-13 20:24:36
+-- Completed on 2022-11-13 14:07:31
 
 --
 -- PostgreSQL database dump complete
