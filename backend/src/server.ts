@@ -9,5 +9,5 @@ server.use(router);
 const port = 3000;
 
 server.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+  console.log(`Backend app running in port ${port}`)
 });
