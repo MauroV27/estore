@@ -20,14 +20,14 @@ export class CategoriaDAO {
     }
     
     public async update(request: Request, response: Response) {
-        const { id, nova_descricao } = request.body;
+        const { id, descricao } = request.body;
 
             const updateCategory = await prisma.categoria.update({
                 where: {
                     id,
                 },
                 data : {
-                    descricao : nova_descricao,
+                    descricao : descricao,
                 }
             })
 

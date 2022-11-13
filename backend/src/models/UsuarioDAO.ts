@@ -34,7 +34,7 @@ export class UsuarioDAO {
     });
 
     if ( getUser == null ){
-      return response.status(500).send("User not find.")
+      return response.json({"status": "failed", "messgae": "User not exist."})
     } else {
       const {senha, ...clientData} = {...getUser};
 
