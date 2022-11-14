@@ -8,6 +8,7 @@ export class UsuarioDAO {
     const { nome, email, senha, endereco, login } = request.body;
 
     // [ISSUE] : encrypt password in database
+    // [ISSUE] : validate if email or login already exist
     const createUser = await prisma.usuario.create({
       data: {
         nome,
@@ -27,9 +28,9 @@ export class UsuarioDAO {
   public async get(request: Request, response: Response) {
     const { id } = request.params;
 
-      if ( id == '' || id == undefined ) return response.json({"status": "failed", "messgae": "Product not exist."})
+    if ( id == '' || id == undefined ) return response.json({"status": "failed", "messgae": "Product not exist."})
 
-      const _id = parseInt(id as string);
+    const _id = parseInt(id as string);
 
     const getUser = await prisma.usuario.findFirst({
       where: {
@@ -112,5 +113,27 @@ export class UsuarioDAO {
     return response.json({"status": "sucess", "messgae": "User deleted."})
   }
 
+  public async validateLogin(request: Request, response: Response) {
+
+    const { login, password } = request.body;
+
+    let userExists = await prisma.usuario.findFirst({
+      where: {
+        login : login,
+      }
+    })
+
+    if ( userExists == null ){
+      return response.json({"status": "failed", "messgae": "User or password was incorect."})
+    }
+
+    if ( userExists.senha != password ){
+      return response.json({"status": "failed", "messgae": "User or password was incorect."})
+    }
+
+    const {senha, ...userData} = {...userExists};
+
+    return response.json(userData);
+  }
 
 }
