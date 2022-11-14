@@ -22,16 +22,16 @@ export class CategoriaDAO {
     public async update(request: Request, response: Response) {
         const { id, descricao } = request.body;
 
-            const updateCategory = await prisma.categoria.update({
-                where: {
-                    id,
-                },
-                data : {
-                    descricao : descricao,
-                }
-            })
+        const updateCategory = await prisma.categoria.update({
+            where: {
+                id,
+            },
+            data : {
+                descricao : descricao,
+            }
+        })
 
-            return response.json({updateCategory});
+        return response.json({updateCategory});
         
     }
 
@@ -48,11 +48,15 @@ export class CategoriaDAO {
     }
 
     public async get(request: Request, response: Response) {
-        const { id } = request.body;
+        const { id } = request.params;
+
+        if ( id == '' || id == undefined ) return response.json({"status": "failed", "messgae": "Product not exist."})
+
+        const _id = parseInt(id as string);
 
         const getCategory = await prisma.categoria.findMany({
           where: {
-            id,
+            id : _id,
           },
         });
 

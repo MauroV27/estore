@@ -25,11 +25,15 @@ export class UsuarioDAO {
   }
 
   public async get(request: Request, response: Response) {
-    const { id } = request.body;
+    const { id } = request.params;
+
+      if ( id == '' || id == undefined ) return response.json({"status": "failed", "messgae": "Product not exist."})
+
+      const _id = parseInt(id as string);
 
     const getUser = await prisma.usuario.findFirst({
       where: {
-        id,
+        id : _id,
       },
     });
 

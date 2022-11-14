@@ -90,11 +90,15 @@ export class ProdutoDAO {
     }
 
     public async get(request: Request, response: Response) {
-        const { id } = request.body;
+        const { id } = request.params;
+
+        if ( id == '' || id == undefined ) return response.json({"status": "failed", "messgae": "Product not exist."})
+
+        const _id = parseInt(id as string);
 
         const productExists = await prisma.produto.findUnique({
             where: {
-                id
+                id : _id,
             }
         })
     
@@ -104,7 +108,7 @@ export class ProdutoDAO {
 
         const getProduct = await prisma.produto.findFirst({
           where: {
-            id,
+            id : _id,
           },
         });
 
