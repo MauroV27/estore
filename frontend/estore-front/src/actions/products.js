@@ -9,6 +9,15 @@ export const getProduct = async (id) => {
       }
 }
 
+export const getProducts = async () => {
+    try {
+        return await api.fetchProducts();
+        
+      } catch (error) {
+        console.log(error.message);
+      }
+}
+
 export const createProduct = async (product) => {
     try {
         return await api.createProduct(product);
