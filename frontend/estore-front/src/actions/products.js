@@ -1,8 +1,8 @@
 import * as api from '../api/products';
 
-export const getProdutcs = async (id) => {
+export const getProduct = async (id) => {
     try {
-        return await api.fetchProducts(id);
+        return await api.fetchProduct(id);
         
       } catch (error) {
         console.log(error.message);
@@ -18,9 +18,9 @@ export const createProduct = async (product) => {
       }
 }
 
-export const updateProduct = async (updateProsuct) => {
+export const updateProduct = async (updateProduct) => {
     try {
-        return await api.updateProduct(updateProsuct);
+        return await api.updateProduct(updateProduct);
         
       } catch (error) {
         console.log(error.message);
