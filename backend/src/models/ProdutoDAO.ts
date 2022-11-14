@@ -115,6 +115,23 @@ export class ProdutoDAO {
         return response.json({getProduct})
     }
 
+    public async getAll(request: Request, response: Response) {
+
+        const products = await prisma.produto.findMany({
+            where: {
+                quantidade : 1
+            }
+        })
+
+        // console.log(products)
+        
+        if ( products == null ){
+            return response.json({"status": "failed", "message": "No existing products."})
+        }
+
+        return response.json({products})
+    }
+
 
     private validateDataForCreateProduct(descricao:string, preco:number, foto:string, quantidade:number) : ProductResponse{
         // Method that validate data input for create a new product or update product data

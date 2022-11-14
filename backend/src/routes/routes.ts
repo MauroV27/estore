@@ -17,6 +17,7 @@ const produtoDAO = new ProdutoDAO();
 
 router.post('/product/', produtoDAO.create);
 router.get('/product/:id', produtoDAO.get);
+router.get('/product/', produtoDAO.getAll);
 router.put('/product/', produtoDAO.update);
 router.delete('/product/', produtoDAO.delete);
 
