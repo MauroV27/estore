@@ -25,73 +25,72 @@ export class UsuarioDAO {
     return response.json({id:createUser.id, nome, email, login});
   }
 
-  public async get(request: Request, response: Response) {
-    const { id } = request.params;
+  public async get( id: number ) {
 
-    if ( id == '' || id == undefined ) return response.json({"status": "failed", "messgae": "Product not exist."})
+    // if ( id == '' || id == undefined ) return {status: "failed", message: "User not exist.", data: {}};
 
-    const _id = parseInt(id as string);
+    // const _id = parseInt(id as string);
 
     const getUser = await prisma.usuario.findFirst({
       where: {
-        id : _id,
+        id : id,
       },
     });
 
     if ( getUser == null ){
-      return response.json({"status": "failed", "messgae": "User not exist."})
+      return {status: "failed", message: "User not exist.", data: null};
     } else {
+      // remove password for response
       const {senha, ...clientData} = {...getUser};
 
-      console.log("Get user: ", clientData);
-      return response.json(clientData);
+      return {status: "success", message: "User exist.", data: clientData};
     }
   }
 
-  public async update(request: Request, response: Response) {
-
-    const { id, nome, email, senha, endereco, login } = request.body;
+  public async update(params:{id:number, name:string, email:string, password:string, adress:string, login:string}) {
 
     let userExists = await prisma.usuario.findUnique({
       where: {
-        id
+        id : params.id
       }
     })
 
     if ( userExists == null ){
-      return response.json({"status": "failed", "messgae": "User not exist."})
+      return {status: "failed", message: "User not exist.", data: null};
     }
 
     // [ISSUE] : encrypt password in database
+    const encryptPassword : string = params.password;
 
     const updateUser = await prisma.usuario.update({
       where: {
-        id : id,
+        id : params.id,
       },
       data: {
-        nome,
-        email,
-        login,
-        endereco,
-        senha,
+        nome : params.name,
+        email : params.email,
+        login : params.login,
+        endereco : params.adress,
+        senha : encryptPassword,
       },
     });
 
-    const clientData = {
-      id, 
-      nome: updateUser.nome, 
-      email: updateUser.email, 
-      endereco: updateUser.endereco, 
-      login: updateUser.login
-    };
+    // const clientData = {
+    //   id, 
+    //   nome: updateUser.nome, 
+    //   email: updateUser.email, 
+    //   endereco: updateUser.endereco, 
+    //   login: updateUser.login
+    // };
 
-    return response.json(clientData);
+    // remove password and administrator for response
+    const {senha, administrador, ...clientData} = {...updateUser};
+
+    return {status: "success", message: "User was updated.", data: clientData};
     
   }
 
-  public async delete(request: Request, response: Response) {
-
-    const { id } = request.body;
+  public async delete( id: number ) {
 
     let userExists = await prisma.usuario.findUnique({
       where: {
@@ -100,7 +99,7 @@ export class UsuarioDAO {
     })
 
     if ( userExists == null ){
-      return response.json({"status": "failed", "messgae": "User not exist."})
+      return {status: "failed", message: "User not exist."};
     }
 
     // [ISSUE] : This method not suport -> Cascading deletes (deleting related records)
@@ -110,30 +109,26 @@ export class UsuarioDAO {
       },
     })
 
-    return response.json({"status": "sucess", "messgae": "User deleted."})
+    return {status: "success", message: "User deleted."};
   }
 
-  public async validateLogin(request: Request, response: Response) {
-
-    const { login, password } = request.body;
+  public async getUserLogin(login:string, password:string) {
 
     let userExists = await prisma.usuario.findFirst({
       where: {
-        login : login,
+        login: login,
       }
     })
 
     if ( userExists == null ){
-      return response.json({"status": "failed", "messgae": "User or password was incorect."})
+      return {status: "failed", message: "User or password was incorect.", id: -1}
     }
 
     if ( userExists.senha != password ){
-      return response.json({"status": "failed", "messgae": "User or password was incorect."})
+      return {status: "failed",  message: "User or password was incorect.", id: -1}
     }
 
-    const {senha, ...userData} = {...userExists};
-
-    return response.json(userData);
+    return {status: "success", message: "success", id: userExists.id};
   }
 
 }
