@@ -1,17 +1,20 @@
 import { Router } from 'express';
 
-import { UsuarioDAO } from '../models/UsuarioDAO';
 import { ProdutoDAO } from '../models/ProdutoDAO';
 import { CategoriaDAO } from '../models/CategoriaDAO';
+import { UserConnect } from '../controllers/managerUserSession';
 
 const router : Router = Router();
 
-const usuarioDAO = new UsuarioDAO();
+const userConnect = new UserConnect();
 
-router.post('/user/', usuarioDAO.create);
-router.get('/user/:id', usuarioDAO.get);
-router.put('/user/', usuarioDAO.update);
-router.delete('/user/', usuarioDAO.delete);
+router.post('/login/', userConnect.validateLogin);
+router.post('/logout/', userConnect.logoutUser);
+
+router.post('/user/', userConnect.createUser); //register
+router.get('/user/', userConnect.getUser);
+router.put('/user/', userConnect.updateUser);
+router.delete('/user/', userConnect.deleteUser);
 
 const produtoDAO = new ProdutoDAO();
 

@@ -1,35 +1,37 @@
-import { Request, Response } from "express";
 import PrismaConnect from '../db/prismaConnect';
 
 const prisma = PrismaConnect.getInstance();
 
 export class UsuarioDAO {
-  public async create(request: Request, response: Response) {
-    const { nome, email, senha, endereco, login } = request.body;
+  public async create(params:{name:string, email:string, password:string, adress:string, login:string}) {
+
+    // [ISSUE] : add validation for all atributes
+    if ( params.name == '' || params.email == '' || params.login == '' || params.password == '' ){
+      return {status: "failed", message: "User not exist.", data: null};
+    }
 
     // [ISSUE] : encrypt password in database
+    const encryptPassword : string = params.password;
+
     // [ISSUE] : validate if email or login already exist
+
     const createUser = await prisma.usuario.create({
       data: {
-        nome,
+        nome: params.name,
         administrador : false,
-        email,
-        login,
-        endereco,
-        senha,
+        email : params.email,
+        login : params.login,
+        endereco : params.adress || "",
+        senha : encryptPassword,
       },
     });
 
-    console.log("Create user in database: ", createUser);
+    const {senha, ...clientData} = {...createUser};
     
-    return response.json({id:createUser.id, nome, email, login});
+    return {status: "success", message: "success", data: clientData};
   }
 
   public async get( id: number ) {
-
-    // if ( id == '' || id == undefined ) return {status: "failed", message: "User not exist.", data: {}};
-
-    // const _id = parseInt(id as string);
 
     const getUser = await prisma.usuario.findFirst({
       where: {
