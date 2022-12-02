@@ -1,19 +1,29 @@
 import PrismaConnect from '../db/prismaConnect';
+import { hash, compare } from 'bcrypt';
 
 const prisma = PrismaConnect.getInstance();
 
 export class UsuarioDAO {
   public async create(params:{name:string, email:string, password:string, adress:string, login:string}) {
 
-    // [ISSUE] : add validation for all atributes
     if ( params.name == '' || params.email == '' || params.login == '' || params.password == '' ){
       return {status: "failed", message: "User not exist.", data: null};
     }
 
-    // [ISSUE] : encrypt password in database
-    const encryptPassword : string = params.password;
+    const emailStatus = await this.checkIfEmailAlreadyExists(params.email);
 
-    // [ISSUE] : validate if email or login already exist
+    if ( emailStatus.emailAlredyExists ) { 
+      return {status: "failed", message: emailStatus.message, data: null};
+    }
+
+    const loginStatus = await this.checkIfLoginAlreadyExists(params.login);
+
+    if ( loginStatus.loginAlredyExists ) { 
+      return {status: "failed", message: loginStatus.message, data: null};
+    }
+
+    // encrypt password in database [IMPLEMENTED]
+    const hashPassword : string = await this.hashPassword(params.password);
 
     const createUser = await prisma.usuario.create({
       data: {
@@ -22,7 +32,7 @@ export class UsuarioDAO {
         email : params.email,
         login : params.login,
         endereco : params.adress || "",
-        senha : encryptPassword,
+        senha : hashPassword,
       },
     });
 
@@ -61,8 +71,8 @@ export class UsuarioDAO {
       return {status: "failed", message: "User not exist.", data: null};
     }
 
-    // [ISSUE] : encrypt password in database
-    const encryptPassword : string = params.password;
+    // encrypt password in database [IMPLEMENTED]
+    const hashPassword : string = await this.hashPassword(params.password);
 
     const updateUser = await prisma.usuario.update({
       where: {
@@ -73,23 +83,13 @@ export class UsuarioDAO {
         email : params.email,
         login : params.login,
         endereco : params.adress,
-        senha : encryptPassword,
+        senha : hashPassword,
       },
     });
 
-    // const clientData = {
-    //   id, 
-    //   nome: updateUser.nome, 
-    //   email: updateUser.email, 
-    //   endereco: updateUser.endereco, 
-    //   login: updateUser.login
-    // };
-
-    // remove password and administrator for response
     const {senha, administrador, ...clientData} = {...updateUser};
 
     return {status: "success", message: "User was updated.", data: clientData};
-    
   }
 
   public async delete( id: number ) {
@@ -126,11 +126,52 @@ export class UsuarioDAO {
       return {status: "failed", message: "User or password was incorect.", id: -1}
     }
 
-    if ( userExists.senha != password ){
+    const validatePassword = await this.comparePassword(password, userExists.senha);
+
+    if ( validatePassword == false ){
       return {status: "failed",  message: "User or password was incorect.", id: -1}
     }
 
     return {status: "success", message: "success", id: userExists.id};
+  }
+
+
+  public async checkIfLoginAlreadyExists(login:string) {
+
+    const loginExists = await prisma.usuario.findFirst({
+      where: {
+        login: login,
+      }
+    })
+
+    if ( loginExists == null ){
+      return { loginAlredyExists : false, message: undefined};
+    } 
+      
+    return { loginAlredyExists : true, message: "login already exists, please try other..." };
+  }
+
+  public async checkIfEmailAlreadyExists(email:string) {
+
+    const emailExists = await prisma.usuario.findFirst({
+      where: {
+        email: email,
+      }
+    })
+
+    if ( emailExists == null ){
+      return { emailAlredyExists : false, message: undefined};
+    } 
+      
+    return { emailAlredyExists : true, message: "email already exists, please try other..." };
+  }
+
+  private async hashPassword(password:string) {
+    return await hash(password, 12);
+  }
+
+  private async comparePassword(password:string, hash:string) {
+    return await compare(password, hash);
   }
 
 }

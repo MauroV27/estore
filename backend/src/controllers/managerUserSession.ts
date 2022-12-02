@@ -46,12 +46,11 @@ export class UserConnect {
 
         const {status, message, data} = await new UsuarioDAO().create(dataToSend);
 
-        if ( status == 'failed' ){
+        if ( status == 'failed' || data == null ){
             return response.json({status, message});
         }
 
         response.json({status, message, data});
-
     }
 
     public async getUser(request: Request, response: Response) {
