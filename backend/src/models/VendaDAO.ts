@@ -76,6 +76,6 @@ export class VendaDAO {
             return {status: "failed", message:`Sale of id:${userId} not exist.`, data: null};    
         }
 
-        return {status: "success", message:"Sales get...", data: {...salesFromuser}};
+        return {status: "success", message:"Sales get...", data: [...salesFromuser]};
     }
 }

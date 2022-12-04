@@ -109,7 +109,7 @@ export class VendaProdutoDAO {
             return {status:"failed", message:"sale-product not find.", data:null};
         }
 
-        return {status:"success", message:"sale-product get", data:{...find}};
+        return {status:"success", message:"sale-product get", data: [...find]};
     }
 
     public async getSalesWithProduct(productId:number) {
@@ -124,7 +124,7 @@ export class VendaProdutoDAO {
             return {status:"failed", message:"sale-product not find.", data:null};
         }
 
-        return {status:"success", message:"sale-product get", data:{...find}};
+        return {status:"success", message:"sale-product get", data: [...find]};
     }
 
     private valdateInput(sale:Venda, product:Produto, quantidade:number) {

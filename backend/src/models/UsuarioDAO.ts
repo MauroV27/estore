@@ -38,7 +38,7 @@ export class UsuarioDAO {
 
     const {senha, ...clientData} = {...createUser};
     
-    return {status: "success", message: "success", data: clientData};
+    return {status: "success", message: "success", data: {...clientData}};
   }
 
   public async get( id: number ) {
@@ -55,7 +55,7 @@ export class UsuarioDAO {
       // remove password for response
       const {senha, ...clientData} = {...getUser};
 
-      return {status: "success", message: "User exist.", data: clientData};
+      return {status: "success", message: "User exist.", data: {...clientData}};
     }
   }
 
@@ -89,7 +89,7 @@ export class UsuarioDAO {
 
     const {senha, administrador, ...clientData} = {...updateUser};
 
-    return {status: "success", message: "User was updated.", data: clientData};
+    return {status: "success", message: "User was updated.", data: {...clientData}};
   }
 
   public async delete( id: number ) {
@@ -101,7 +101,7 @@ export class UsuarioDAO {
     })
 
     if ( userExists == null ){
-      return {status: "failed", message: "User not exist."};
+      return {status: "failed", message: "User not exist.", data:null};
     }
 
     // [ISSUE] : This method not suport -> Cascading deletes (deleting related records)
@@ -111,7 +111,7 @@ export class UsuarioDAO {
       },
     })
 
-    return {status: "success", message: "User deleted."};
+    return {status: "success", message: "User deleted.", data: {...deleteUser}};
   }
 
   public async getUserLogin(login:string, password:string) {

@@ -41,7 +41,7 @@ export class CategoriaProdutoDAO {
         })
         
         if ( productsInCategory != null ){
-            return {status:"success", message:`get products in category:${categoryId}..`, data: {...productsInCategory}};
+            return {status:"success", message:`get products in category:${categoryId}..`, data: [...productsInCategory]};
         }
 
         return {status:"failed", message:"failed in get products from category:"+categoryId, data:null};
@@ -65,7 +65,7 @@ export class CategoriaProdutoDAO {
         })
 
         if ( CategorysInproduct != null ){
-            return {status:"success", message:`get categorys in product:${productId}..`, data: {...CategorysInproduct}};
+            return {status:"success", message:`get categorys in product:${productId}..`, data: [...CategorysInproduct]};
         }
         
         return {status:"failed", message:"failed in get categorys from product:"+productId, data:null};

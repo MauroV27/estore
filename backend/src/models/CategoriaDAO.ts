@@ -23,7 +23,7 @@ export class CategoriaDAO {
             }});
     
         
-        return {status:"success", message: "Category created", data: createCategory}
+        return {status:"success", message: "Category created", data: {...createCategory}}
         
     }
     
@@ -51,7 +51,7 @@ export class CategoriaDAO {
             }
         })
 
-        return {status:"success", message: "Category updated", data: updateCategory}
+        return {status:"success", message: "Category updated", data: {...updateCategory}}
         
     }
 
@@ -69,7 +69,7 @@ export class CategoriaDAO {
             },
         });
         
-        return {status:"success", message: "Category deleted", data: deleteCategory}
+        return {status:"success", message: "Category deleted", data: {...deleteCategory}}
     }
 
     public async get(id:number) {
@@ -86,7 +86,7 @@ export class CategoriaDAO {
             return {status: "failed", message: "Category not exist.", data: null}
         }
 
-        return {status:"success", message: "Category created", data: getCategory}
+        return {status:"success", message: "Category created", data: {...getCategory}}
     }
 
     public async getAll() {
@@ -98,7 +98,7 @@ export class CategoriaDAO {
             return {status: "failed", message: "Category not exist.", data: null}
         }
 
-        return {status:"success", message: "Category created", data: getAllCategorys}
+        return {status:"success", message: "Category created", data: [...getAllCategorys]}
     }
 
     private async checkIfDescriptionAlreadyExists(description:string) {

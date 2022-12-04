@@ -91,7 +91,7 @@ export class ProdutoDAO {
             return {status: "failed", message: "No existing products.", data:null};
         }
 
-        return {status: "success", message: "Get ALL products", data:{...products}};
+        return {status: "success", message: "Get ALL products", data: [...products]};
     }
 
 
