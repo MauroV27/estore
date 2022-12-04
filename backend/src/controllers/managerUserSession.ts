@@ -113,5 +113,9 @@ export class UserConnect {
 
         response.json({status, message});
     }
+    
+}
 
+export function validateSession(userSessionId:string) : number|undefined {
+    return sessions[userSessionId];
 }
