@@ -4,7 +4,7 @@ import { SalesController } from "../controllers/managerSales";
 const salesConnect = new SalesController();
 
 export function connectSalesRoutes(router:Router) {
-    router.post('/registerSale/', salesConnect.createSale);
+    router.post('/sale/', salesConnect.createSale);
     
     router.get('/sale/', salesConnect.getSale);
     router.get('/salesFromUser/', salesConnect.getAllUserSales);

@@ -15,15 +15,30 @@ export class SalesProductController {
             return response.json({...sale})
         }
 
-        const product = await new ProdutoDAO().get(productId as number);
+        const productDAO = new ProdutoDAO();
+        const product = await productDAO.get(productId as number);
 
         if ( product.data == null || product.status == 'failed' ){
             return response.json({...product})
         }
 
-        const {status, message, data} = await new VendaProdutoDAO().create( sale.data, product.data, amount);
+        const create = await new VendaProdutoDAO().create( sale.data, product.data, amount);
 
-        response.json({status, message, data})
+        if ( create.data == null || create.status == 'failed' ){
+            return response.json({...create})
+        }
+
+        const newAmount = product.data.quantidade - create.data.quantidade;
+
+        const {status, message, data} = await productDAO.update(
+            productId as number, 
+            product.data.descricao, 
+            product.data.preco, 
+            newAmount, 
+            product.data.foto
+        );
+
+        response.json({status, message, data});
     }
 
     public async updateSaleProduct(request: Request, response: Response){
@@ -35,15 +50,30 @@ export class SalesProductController {
             return response.json({...sale})
         }
 
-        const product = await new ProdutoDAO().get(productId as number);
+        const productDAO = new ProdutoDAO();
+        const product = await productDAO.get(productId as number);
 
         if ( product.data == null || product.status == 'failed' ){
             return response.json({...product})
         }
 
-        const {status, message, data} = await new VendaProdutoDAO().update( sale.data, product.data, amount);
+        const update = await new VendaProdutoDAO().update( sale.data, product.data, amount);
 
-        response.json({status, message, data})
+        if ( update.data == null || update.status == 'failed' ){
+            return response.json({...update})
+        }
+
+        const newAmount = product.data.quantidade - update.data.quantidade;
+
+        const {status, message, data} = await productDAO.update(
+            productId as number, 
+            product.data.descricao, 
+            product.data.preco, 
+            newAmount, 
+            product.data.foto
+        );
+
+        response.json({status, message, data});
     }
 
     public async deleteSaleProduct(request: Request, response: Response){
