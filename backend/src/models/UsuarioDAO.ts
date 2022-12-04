@@ -22,13 +22,16 @@ export class UsuarioDAO {
       return {status: "failed", message: loginStatus.message, data: null};
     }
 
+    // all emails that contais @estore will be setted like admin 
+    const isAdmin = String(params.email).includes("@estore");
+
     // encrypt password in database [IMPLEMENTED]
     const hashPassword : string = await this.hashPassword(params.password);
 
     const createUser = await prisma.usuario.create({
       data: {
         nome: params.name,
-        administrador : false,
+        administrador : isAdmin,
         email : params.email,
         login : params.login,
         endereco : params.adress || "",
