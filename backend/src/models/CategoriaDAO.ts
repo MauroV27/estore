@@ -1,42 +1,67 @@
-import { Request, Response } from "express";
-
 import PrismaConnect from '../db/prismaConnect';
 const prisma = PrismaConnect.getInstance();
 
 
 export class CategoriaDAO {
 
-    public async create(request: Request, response: Response) {
-        const { descricao } = request.body;
+    public async create(description:string) {
+
+        if (description == "" || description == undefined ){
+            return {status:"failed", message: "error in descriptions", data: null}
+        }
+
+        // check if description already exists
+        const descriptionAlreadyExist = await this.checkIfDescriptionAlreadyExists(description);
+
+        if ( descriptionAlreadyExist != null ){
+            return {status:"failed", message: `Description: ${description}, already exist.`, data: null}
+        }
 
         const createCategory = await prisma.categoria.create({ 
             data: {
-                descricao : descricao
+                descricao : description
             }});
     
         
-        return response.json({createCategory});
+        return {status:"success", message: "Category created", data: createCategory}
         
     }
     
-    public async update(request: Request, response: Response) {
-        const { id, descricao } = request.body;
+    public async update(id:number, description:string) {
+
+        const {status, message, data} = await this.get(id);
+
+        if ( status == 'failed' || data == null ){
+            return {status, message, data};
+        }
+
+        // check if description already exists
+        const descriptionAlreadyExist = await this.checkIfDescriptionAlreadyExists(description);
+
+        if ( descriptionAlreadyExist != null ){
+            return {status:"failed", message: `Description: ${description}, already exist.`, data: null}
+        }
 
         const updateCategory = await prisma.categoria.update({
             where: {
                 id,
             },
             data : {
-                descricao : descricao,
+                descricao : description,
             }
         })
 
-        return response.json({updateCategory});
+        return {status:"success", message: "Category updated", data: updateCategory}
         
     }
 
-    public async delete(request: Request, response: Response) {
-        const { id } = request.body;
+    public async delete(id:number) {
+
+        const {status, message, data} = await this.get(id);
+
+        if ( status == 'failed' || data == null ){
+            return {status, message, data};
+        }
 
         const deleteCategory = await prisma.categoria.delete({ 
             where : {
@@ -44,23 +69,44 @@ export class CategoriaDAO {
             },
         });
         
-        return response.json({deleteCategory});
+        return {status:"success", message: "Category deleted", data: deleteCategory}
     }
 
-    public async get(request: Request, response: Response) {
-        const { id } = request.params;
+    public async get(id:number) {
 
-        if ( id == '' || id == undefined ) return response.json({"status": "failed", "messgae": "Product not exist."})
+        // const _id = parseInt(id as string);
 
-        const _id = parseInt(id as string);
-
-        const getCategory = await prisma.categoria.findMany({
+        const getCategory = await prisma.categoria.findFirst({
           where: {
-            id : _id,
+            id : id,
           },
         });
 
-        return response.json({getCategory})
+        if ( getCategory == null ) {
+            return {status: "failed", message: "Category not exist.", data: null}
+        }
+
+        return {status:"success", message: "Category created", data: getCategory}
+    }
+
+    public async getAll() {
+        //get all categorys
+
+        const getAllCategorys = await prisma.categoria.findMany();
+
+        if ( getAllCategorys == null ) {
+            return {status: "failed", message: "Category not exist.", data: null}
+        }
+
+        return {status:"success", message: "Category created", data: getAllCategorys}
+    }
+
+    private async checkIfDescriptionAlreadyExists(description:string) {
+        return await prisma.categoria.findFirst({
+            where : {
+                descricao : description,
+            }
+        })
     }
 
 }

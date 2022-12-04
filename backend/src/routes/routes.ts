@@ -1,34 +1,41 @@
 import { Router } from 'express';
 
-import { ProdutoDAO } from '../models/ProdutoDAO';
-import { CategoriaDAO } from '../models/CategoriaDAO';
-import { UserConnect } from '../controllers/managerUserSession';
+import { connectUserRoutes } from './UserRoutes';
+import { connectProductRoutes } from './ProductRoutes';
+import { connectCategoryRoutes } from './CategoryRoutes';
+import { connectProductCategoryRoutes } from './CategoryProductsRoutes';
+
+// import { VendaDAO } from '../models/VendaDAO'; //teste
 
 const router : Router = Router();
 
-const userConnect = new UserConnect();
+connectUserRoutes(router);
+connectProductRoutes(router);
+connectCategoryRoutes(router);
+connectProductCategoryRoutes(router);
 
-router.post('/login/', userConnect.validateLogin);
-router.post('/logout/', userConnect.logoutUser);
+// router.post('/sales/', async (req, res) => {
+//     // problema no postrgress está impedindo de funcionar [BUG][CRITICAL]
+//     const {userId} = req.body;
 
-router.post('/user/', userConnect.createUser); //register
-router.get('/user/', userConnect.getUser);
-router.put('/user/', userConnect.updateUser);
-router.delete('/user/', userConnect.deleteUser);
+//     if ( userId != null || userId != undefined ){
 
-const produtoDAO = new ProdutoDAO();
+//         const {status, message, data} = await new VendaDAO().create(userId as number);
 
-router.post('/product/', produtoDAO.create);
-router.get('/product/:id', produtoDAO.get);
-router.get('/product/', produtoDAO.getAll);
-router.put('/product/', produtoDAO.update);
-router.delete('/product/', produtoDAO.delete);
+//         res.json({status, message, data});
+//     }
+// })
 
-const categoriaDAO = new CategoriaDAO();
+// router.get('/sales/', async (req, res) => {
+//     // problema no postrgress está impedindo de funcionar [BUG][CRITICAL]
+//     const {vendaid} = req.body;
 
-router.post('/category/', categoriaDAO.create);
-router.get('/category/:id', categoriaDAO.get);
-router.put('/category/', categoriaDAO.update);
-router.delete('/category/', categoriaDAO.delete);
+//     if ( vendaid != null || vendaid != undefined ){
+
+//         const {status, message, data} = await new VendaDAO().getOne(vendaid as number);
+
+//         res.json({status, message, data});
+//     }
+// })
 
 export {router}

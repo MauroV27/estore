@@ -1,58 +1,74 @@
-import { Request, Response } from "express";
-
+import { Categoria, Produto } from '@prisma/client';
 import PrismaConnect from '../db/prismaConnect';
 const prisma = PrismaConnect.getInstance();
 
 export class CategoriaProdutoDAO {
 
-    public async create(request: Request, response: Response) {
-        const { categoriaId, produtoId } = request.body;
+    public async create( product:Produto|null, categoria:Categoria|null) {
+
+        if (product == null || categoria == null){
+            return {status:"failed", message:"failed in get data", data:null};
+        }
 
         const createCategoryProduct = await prisma.categoriaProduto.create({ 
             data: {
-                categoriaId,
-                produtoId,
+                categoriaId : categoria.id,
+                produtoId : product.id,
             }});
         
-        return response.json({
-            createCategoryProduct
-        });
-        
+        if ( createCategoryProduct != null ){
+            return {status:"success", message:`Product:${product.id} added to category:${categoria.id}..`, data: {...createCategoryProduct}};
+        }
+
+        return {status:"failed", message:"failed in get products", data:null};
     }
 
-    public async getProductsFromCategory(request: Request, response: Response) {
+    public async getProductsFromCategory(categoria:Categoria|null) {
         // Get products  from a especific category
-        const { categoriaId } = request.body;
+
+        if (categoria == null){
+            return {status:"failed", message:"failed in get data", data:null};
+        }
+
+        const categoryId : number = categoria.id;
 
         const productsInCategory = await prisma.categoriaProduto.findMany({
             where :{
                 categoria : {
-                    id : categoriaId,
+                    id : categoryId,
                 }
             }
         })
         
-        return response.json({
-            productsInCategory
-        });
+        if ( productsInCategory != null ){
+            return {status:"success", message:`get products in category:${categoryId}..`, data: {...productsInCategory}};
+        }
+
+        return {status:"failed", message:"failed in get products from category:"+categoryId, data:null};
     }
 
-    public async getCategorysFromProduct(request: Request, response: Response) {
+    public async getCategorysFromProduct(product:Produto|null) {
         // Get categorys from a especific product
 
-        const { produtoId } = request.body;
+        if (product == null){
+            return {status:"failed", message:"failed in get data", data:null};
+        }
+
+        const productId : number = product.id;
 
         const CategorysInproduct = await prisma.categoriaProduto.findMany({
             where :{
                 produto : {
-                    id : produtoId,
+                    id :productId,
                 }
             }
         })
+
+        if ( CategorysInproduct != null ){
+            return {status:"success", message:`get categorys in product:${productId}..`, data: {...CategorysInproduct}};
+        }
         
-        return response.json({
-            CategorysInproduct
-        });
+        return {status:"failed", message:"failed in get categorys from product:"+productId, data:null};
     }
 
 }

@@ -1,83 +1,64 @@
-import { Request, Response } from "express";
-
 import PrismaConnect from '../db/prismaConnect';
 const prisma = PrismaConnect.getInstance();
 
-interface ProductStructure {
-    descricao: string; 
-    preco: number; 
-    foto: string; 
-    quantidade:number;
-}
-
-interface ProductResponse {
-    status : String;
-    message : String;
-    result: ProductStructure | undefined;
-} 
-
 export class ProdutoDAO {
 
-    public async create(request: Request, response: Response) {
-        const { descricao, preco, foto, quantidade } = request.body;
+    public async create(description:string, price:number, amount:number, photoURL:string) {
 
-        // const {status, message, result} : ProductResponse = this.validateDataForCreateProduct(descricao, preco, foto, quantidade);
+        const {status, message, data} = this.validateDataForCreateProduct(description, price, amount, photoURL);
 
-        // if ( result == undefined ){
-        //     return response.json({status, message})
-        // } else {
-        // [ISSUE] : Data used to create product is not validate
+        if ( status == "ERROR" || data == null ){
+            return {status, message, data};
+        }
+
         const createProduct = await prisma.produto.create({ 
             data: {
-                descricao : descricao, 
-                preco : preco, 
-                foto : foto,
-                quantidade : quantidade,
+                descricao : data.descricao, 
+                preco : data.preco, 
+                foto : data.foto,
+                quantidade : data.quantidade,
             }});
         
-        return response.json({createProduct});
-        // }
-        
+        return {status:"success", message: "Product created", data: {...createProduct}};
     }
     
-    public async update(request: Request, response: Response) {
-        const { id, descricao, preco, foto, quantidade } = request.body;
-
-        // const {status, message, result} : ProductResponse = this.validateDataForCreateProduct(descricao, preco, foto, quantidade);
-
-        // if ( result == undefined ){
-        //     return response.json({status, message})
-        // } else {
+    public async update(id:number, description:string, price:number, amount:number, photoURL:string) {
             
-        // [ISSUE] : id can not exist in db
-        // [ISSUE] : Data used to update product is not validate
+        // id can not exist in db [IMPLEMENTED]
+        const idExists = await this.idExistsInProducts(id);
+
+        if ( idExists == null ){
+            return {status: "Failed", message: `Product with id:${id} not exist.`, data: null};
+        }
+        
+        // Data used to update product is not validate [IMPLEMENTED]
+        const {status, message, data} = this.validateDataForCreateProduct(description, price, amount, photoURL);
+
+        if ( status == "ERROR" || data == null ){
+            return {status, message, data};
+        }
+        
         const updateProduct = await prisma.produto.update({ 
             where : {
-                id,
+                id : id,
             },
             data: {
-                descricao : descricao, 
-                preco : preco, 
-                foto : foto,
-                quantidade : quantidade,
+                descricao : data.descricao, 
+                preco : data.preco, 
+                foto : data.foto,
+                quantidade : data.quantidade,
             },
         });
         
-        return response.json({id:updateProduct.id});
-        // }
+        return {status: "success", message: "Product updated", data: {...updateProduct}};
     }
 
-    public async delete(request: Request, response: Response) {
-        const { id } = request.body;
+    public async delete(id:number) {
 
-        const productExists = await prisma.produto.findUnique({
-            where: {
-                id
-            }
-        })
-    
-        if ( productExists == null ){
-            return response.json({"status": "failed", "messgae": "Product not exist."})
+        const idExists = await this.idExistsInProducts(id);
+
+        if ( idExists == null ){
+            return {status: "failed", message: `Product with id:${id} not exist.`, data: null};
         }
 
         const deletedProduct = await prisma.produto.delete({ 
@@ -86,68 +67,58 @@ export class ProdutoDAO {
             },
         });
         
-        return response.json({deletedProduct});
+        return {status: "success", message: "Product deleted", data: {...deletedProduct}};
     }
 
-    public async get(request: Request, response: Response) {
-        const { id } = request.params;
+    public async get(id:number) {
 
-        if ( id == '' || id == undefined ) return response.json({"status": "failed", "messgae": "Product not exist."})
+        // const _id = parseInt(id as string);
+        // id can not exist in db [IMPLEMENTED]
+        const idExists = await this.idExistsInProducts(id);
 
-        const _id = parseInt(id as string);
-
-        const productExists = await prisma.produto.findUnique({
-            where: {
-                id : _id,
-            }
-        })
-    
-        if ( productExists == null ){
-            return response.json({"status": "failed", "messgae": "Product not exist."})
+        if ( idExists == null ){
+            return {status: "failed", message: `Product with id:${id} not exist.`, data: null};
         }
 
-        const getProduct = await prisma.produto.findFirst({
-          where: {
-            id : _id,
-          },
-        });
-
-        return response.json({getProduct})
+        return {status: "success", message: "Get ONE product", data: {...idExists}};
     }
 
-    public async getAll(request: Request, response: Response) {
+    public async getAll() {
 
-        const products = await prisma.produto.findMany({
-            where: {
-                quantidade : 1
-            }
-        })
-
-        // console.log(products)
+        const products = await prisma.produto.findMany(); // get all prdocuts in database
         
         if ( products == null ){
-            return response.json({"status": "failed", "message": "No existing products."})
+            return {status: "failed", message: "No existing products.", data:null};
         }
 
-        return response.json({products})
+        return {status: "success", message: "Get ALL products", data:{...products}};
     }
 
 
-    private validateDataForCreateProduct(descricao:string, preco:number, foto:string, quantidade:number) : ProductResponse{
+    private async idExistsInProducts(id:number){
+        return await prisma.produto.findFirst({
+            where: {
+                id : id
+            }
+        });
+    }
+
+
+    private validateDataForCreateProduct(descricao:string, preco:number, quantidade:number, foto:string,) {
         // Method that validate data input for create a new product or update product data
         
-        descricao = descricao.trim()
-        foto = foto.trim()
+        descricao = String(descricao).trim();
+        foto = String(foto).trim();
 
         if ( preco <= 0 ){
-            return {status:"ERROR", message: "Value of price must be bigger than 0.", result:undefined};
+            return {status:"ERROR", message: "Value of price must be bigger than 0.", data:null};
         }
 
-        if ( quantidade <= 0 || !Number.isInteger(quantidade) ){
-            return {status:"ERROR", message: "Value of quantytie must be a positive integer.", result:undefined};
+        if ( quantidade <= 0 || Number.isInteger(quantidade) == false){
+            return {status:"ERROR", message: "Value of quantytie must be a positive integer.", data:null};
         }
 
-        return {status: "OK", message:"success", result:{descricao, preco, foto, quantidade}};
+        return {status: "OK", message:"success", data:{descricao, preco, foto, quantidade}};
     }
 
 }
