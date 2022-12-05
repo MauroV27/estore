@@ -9,4 +9,6 @@ export function connectCategoryRoutes(router:Router) {
     router.get('/category/', category.getAllCategory);
     router.put('/category/', category.updateCategory);
     router.delete('/category/', category.deleteCategory);
+
+    router.get('/categorys/', category.getAllCategory);
 }
