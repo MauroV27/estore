@@ -4,29 +4,45 @@ import Button from "../../components/Button";
 import * as C from "./styles";
 import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
+import { loginUser } from "../../actions/users";
 
 const Signin = () => {
-  const { signin } = useAuth();
+  // const { signin } = useAuth();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
+  const [login, setLogin] = useState("");
   const [senha, setSenha] = useState("");
   const [error, setError] = useState("");
 
-  const handleLogin = () => {
-    if (!email | !senha) {
+  const handleLogin = async () => {
+    if (!login | !senha) {
       setError("Preencha todos os campos");
       return;
     }
 
-    const res = signin(email, senha);
+    // const res = signin(email, senha);
+    console.log("Valores: ", login, "  -  ", senha)
+    const res = await loginUser(login, senha)
+    console.log(res)
 
     if (res) {
-      setError(res);
-      return;
+      if ( res.data ) { 
+        const {message, status, userSessionId} = res.data;
+      
+        if ( status === "success" ){
+          // login deu bom
+          // mudar para a outra tela
+          // salvar o valor userSessionId na memoria do navegador
+          navigate("/home");
+        } else {
+          setError(`Erro ao logar: ${message}`);
+
+        }
+      }
+    
+      
     }
 
-    navigate("/home");
   };
 
   return (
@@ -34,10 +50,10 @@ const Signin = () => {
       <C.Label>LOGIN ESTORE</C.Label>
       <C.Content>
         <Input
-          type="email"
-          placeholder="Digite seu E-mail"
-          value={email}
-          onChange={(e) => [setEmail(e.target.value), setError("")]}
+          type="text"
+          placeholder="Digite seu login"
+          value={login}
+          onChange={(e) => [setLogin(e.target.value), setError("")]}
         />
         <Input
           type="password"
