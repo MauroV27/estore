@@ -1,12 +1,19 @@
 import { Router } from 'express';
 
-import { UsuarioDAO } from '../models/UsuarioDAO';
+import { connectUserRoutes } from './UserRoutes';
+import { connectProductRoutes } from './ProductRoutes';
+import { connectCategoryRoutes } from './CategoryRoutes';
+import { connectProductCategoryRoutes } from './CategoryProductsRoutes';
+import { connectSalesRoutes } from './SalesRoutes';
+import { connectSalesProductsRoutes } from './SalesProductsRoutes';
 
 const router : Router = Router();
 
-const usuarioDAO = new UsuarioDAO();
-
-router.get('/user/:id', usuarioDAO.get);
-router.post('/user/', usuarioDAO.create);
+connectUserRoutes(router);
+connectSalesRoutes(router);
+connectProductRoutes(router);
+connectCategoryRoutes(router);
+connectSalesProductsRoutes(router);
+connectProductCategoryRoutes(router);
 
 export {router}

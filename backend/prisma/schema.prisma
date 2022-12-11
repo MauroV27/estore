@@ -8,28 +8,28 @@ datasource db {
 }
 
 model Categoria {
-  id                Int                 @id @default(autoincrement())
-  descricao         String              @db.VarChar
+  id                Int                @id @default(autoincrement())
+  descricao         String             @db.VarChar
   categoria_produto CategoriaProduto[]
 
   @@map("categoria")
 }
 
 model CategoriaProduto {
-  categoriaId Int       @default(autoincrement()) @map("categoria_id")
-  produtoId   Int       @default(autoincrement()) @map("produto_id")
-  categoria    Categoria @relation(fields: [categoriaId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "categoria_id")
-  produto      Produto   @relation(fields: [produtoId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "produto_id")
+  categoriaId Int       @map("categoria_id")
+  produtoId   Int       @map("produto_id")
+  categoria   Categoria @relation(fields: [categoriaId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "categoria_id")
+  produto     Produto   @relation(fields: [produtoId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "produto_id")
 
   @@id([categoriaId, produtoId])
   @@map("categoria_produto")
 }
 
 model Produto {
-  id                Int                 @id @default(autoincrement())
-  descricao         String              @db.VarChar
+  id                Int                @id @default(autoincrement())
+  descricao         String             @db.VarChar
   preco             Float
-  foto              String              @db.VarChar
+  foto              String             @db.VarChar
   quantidade        Int
   categoria_produto CategoriaProduto[]
   venda_produto     VendaProduto[]
@@ -51,18 +51,18 @@ model Usuario {
 }
 
 model Venda {
-  id            Int             @id @default(autoincrement())
-  dataHora      DateTime        @db.Timestamp(6) @map("data_hora")
-  usuarioId     Int             @default(autoincrement()) @map("usuario_id")
-  usuario       Usuario         @relation(fields: [usuarioId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "usuario_id")
+  id            Int            @id @default(autoincrement())
+  dataHora      DateTime       @map("data_hora") @db.Timestamp(6)
+  usuarioId     Int            @map("usuario_id")
+  usuario       Usuario        @relation(fields: [usuarioId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "usuario_id")
   venda_produto VendaProduto[]
 
   @@map("venda")
 }
 
 model VendaProduto {
-  vendaId    Int     @default(autoincrement()) @map("venda_id")
-  produtoId  Int     @default(autoincrement()) @map("produto_id")
+  vendaId    Int     @map("venda_id")
+  produtoId  Int     @map("produto_id")
   quantidade Int
   produto    Produto @relation(fields: [produtoId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "produto_id")
   venda      Venda   @relation(fields: [vendaId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "venda_id")

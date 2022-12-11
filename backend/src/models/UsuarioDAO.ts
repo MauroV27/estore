@@ -1,49 +1,180 @@
-import { Request, Response } from "express";
-import { PrismaClient, Usuario } from "@prisma/client";
+import PrismaConnect from '../db/prismaConnect';
+import { hash, compare } from 'bcrypt';
 
-const prismaClient = new PrismaClient();
+const prisma = PrismaConnect.getInstance();
 
 export class UsuarioDAO {
-  public async create(request: Request, response: Response) {
-    const { nome, email, senha, endereco, login } = request.body;
+  public async create(params:{name:string, email:string, password:string, adress:string, login:string}) {
 
-    const createUser = await prismaClient.usuario.create({
+    if ( params.name == '' || params.email == '' || params.login == '' || params.password == '' ){
+      return {status: "failed", message: "User not exist.", data: null};
+    }
+
+    const emailStatus = await this.checkIfEmailAlreadyExists(params.email);
+
+    if ( emailStatus.emailAlredyExists ) { 
+      return {status: "failed", message: emailStatus.message, data: null};
+    }
+
+    const loginStatus = await this.checkIfLoginAlreadyExists(params.login);
+
+    if ( loginStatus.loginAlredyExists ) { 
+      return {status: "failed", message: loginStatus.message, data: null};
+    }
+
+    // all emails that contais @estore will be setted like admin 
+    const isAdmin = String(params.email).includes("@estore");
+
+    // encrypt password in database [IMPLEMENTED]
+    const hashPassword : string = await this.hashPassword(params.password);
+
+    const createUser = await prisma.usuario.create({
       data: {
-        nome,
-        administrador : false,
-        email,
-        login,
-        endereco,
-        senha,
+        nome: params.name,
+        administrador : isAdmin,
+        email : params.email,
+        login : params.login,
+        endereco : params.adress || "",
+        senha : hashPassword,
       },
     });
 
-    console.log("Create user in database: ", createUser);
+    const {senha, ...clientData} = {...createUser};
     
-    return response.json({id:createUser.id, nome, email, login});
+    return {status: "success", message: "success", data: {...clientData}};
   }
 
-  public async get(request: Request, response: Response) {
-    const { id } = request.body;
+  public async get( id: number ) {
 
-    const getUser = await prismaClient.usuario.findFirst({
+    const getUser = await prisma.usuario.findFirst({
       where: {
-        id,
+        id : id,
       },
     });
 
     if ( getUser == null ){
-      return response.status(500).send("Usuario não encontrado")
+      return {status: "failed", message: "User not exist.", data: null};
     } else {
+      // remove password for response
       const {senha, ...clientData} = {...getUser};
 
-      console.log("Get user: ", clientData);
-      return response.json(clientData);
+      return {status: "success", message: "User exist.", data: {...clientData}};
     }
   }
 
-  private hideSensitiveDataForResponse(user:Usuario) : Object{
-    const {senha, ...publicData} = {...user}; 
-    return publicData;
+  public async update(params:{id:number, name:string, email:string, password:string, adress:string, login:string}) {
+
+    let userExists = await prisma.usuario.findUnique({
+      where: {
+        id : params.id
+      }
+    })
+
+    if ( userExists == null ){
+      return {status: "failed", message: "User not exist.", data: null};
+    }
+
+    // encrypt password in database [IMPLEMENTED]
+    const hashPassword : string = await this.hashPassword(params.password);
+
+    const updateUser = await prisma.usuario.update({
+      where: {
+        id : params.id,
+      },
+      data: {
+        nome : params.name,
+        email : params.email,
+        login : params.login,
+        endereco : params.adress,
+        senha : hashPassword,
+      },
+    });
+
+    const {senha, administrador, ...clientData} = {...updateUser};
+
+    return {status: "success", message: "User was updated.", data: {...clientData}};
   }
+
+  public async delete( id: number ) {
+
+    let userExists = await prisma.usuario.findUnique({
+      where: {
+        id
+      }
+    })
+
+    if ( userExists == null ){
+      return {status: "failed", message: "User not exist.", data:null};
+    }
+
+    // [ISSUE] : This method not suport -> Cascading deletes (deleting related records)
+    const deleteUser = await prisma.usuario.delete({
+      where: {
+        id,
+      },
+    })
+
+    return {status: "success", message: "User deleted.", data: {...deleteUser}};
+  }
+
+  public async getUserLogin(login:string, password:string) {
+
+    let userExists = await prisma.usuario.findFirst({
+      where: {
+        login: login,
+      }
+    })
+
+    if ( userExists == null ){
+      return {status: "failed", message: "User or password was incorect.", id: -1}
+    }
+
+    const validatePassword = await this.comparePassword(password, userExists.senha);
+
+    if ( validatePassword == false ){
+      return {status: "failed",  message: "User or password was incorect.", id: -1}
+    }
+
+    return {status: "success", message: "success", id: userExists.id};
+  }
+
+
+  public async checkIfLoginAlreadyExists(login:string) {
+
+    const loginExists = await prisma.usuario.findFirst({
+      where: {
+        login: login,
+      }
+    })
+
+    if ( loginExists == null ){
+      return { loginAlredyExists : false, message: undefined};
+    } 
+      
+    return { loginAlredyExists : true, message: "login already exists, please try other..." };
+  }
+
+  public async checkIfEmailAlreadyExists(email:string) {
+
+    const emailExists = await prisma.usuario.findFirst({
+      where: {
+        email: email,
+      }
+    })
+
+    if ( emailExists == null ){
+      return { emailAlredyExists : false, message: undefined};
+    } 
+      
+    return { emailAlredyExists : true, message: "email already exists, please try other..." };
+  }
+
+  private async hashPassword(password:string) {
+    return await hash(password, 12);
+  }
+
+  private async comparePassword(password:string, hash:string) {
+    return await compare(password, hash);
+  }
+
 }
