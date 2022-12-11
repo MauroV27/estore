@@ -4,32 +4,32 @@ import { baseURL } from './baseurl';
 const users_url = baseURL + '/user'
 
 // export const fetchUser  = (id) => axios.get(`${users_url}/${id}`);
-export const createUser = (name, email, password, adress, login) => {
+export const createUser = async (name, email, password, adress, login) => {
     // @params (string, string, string, string, string)
-    axios.post(`${baseURL}/register/`, {name, email, password, adress, login})
+    return await axios.post(`${baseURL}/register/`, {name, email, password, adress, login})
 };
 
-export const updateUser = (userSessionId, name, email, password, adress, login) => {
+export const updateUser = async (userSessionId, name, email, password, adress, login) => {
     // @params (string, string, string, string, string, string)
-    axios.put(users_url, {userSessionId, name, email, password, adress, login})
+    return await axios.put(users_url, {userSessionId, name, email, password, adress, login})
 };
 
-export const loginUser = (login, Password) => {
+export const loginUser = async (login, password) => {
     // @params (string, string)
-    axios.post(`${baseURL}/login/`, {login, Password})
+    return await axios.post(`${baseURL}/login/`, {login, password})
 };
 
-export const logouUser = (userSessionId) => {
+export const logouUser = async (userSessionId) => {
     // @params (string)
-    axios.post(`${baseURL}/logout/`, {userSessionId})
+    return await axios.post(`${baseURL}/logout/`, {userSessionId})
 };
 
-export const getUser = (userSessionId) => {
+export const getUser = async (userSessionId) => {
     // @params (string)
-    axios.get(users_url, {userSessionId})
+    return await axios.get(users_url, {userSessionId})
 }
 
-export const deleteUser = (userSessionId) => {
+export const deleteUser = async (userSessionId) => {
     // @params (string)
-    axios.delete(users_url, {userSessionId})
+    return await axios.delete(users_url, {userSessionId})
 };

@@ -1,17 +1,17 @@
 import axios from 'axios';
 import { baseURL } from './baseurl';
 
-export const addProductCategory = (productId, categoryId ) => {
+export const addProductCategory = async (productId, categoryId ) => {
     // @param (number, number)
-    axios.post(baseURL + '/addProductToCategory/', {productId, categoryId })
+    return await axios.post(baseURL + '/addProductToCategory/', {productId, categoryId })
 };
 
-export const getProductsFromCategory = (categoryId) => {
+export const getProductsFromCategory = async (categoryId) => {
     // @param (number)
-    axios.get(baseURL + '/getProductsFromCategory/', {categoryId})
+    return await axios.get(baseURL + '/getProductsFromCategory/', {categoryId})
 };
 
-export const getCategorysFromProduct = (productId) => {
+export const getCategorysFromProduct = async (productId) => {
     // @param (number)
-    axios.get(baseURL + '/getCategorysFromProduct/', {productId})
+    return await axios.get(baseURL + '/getCategorysFromProduct/', {productId})
 }

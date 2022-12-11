@@ -1,35 +1,44 @@
 import * as api from '../api/users';
 
-export const getUser = async (id) => {
+export const loginUser = async (login, password) => {
+  try {
+      return await api.loginUser(login, password);
+      
+    } catch (error) {
+      console.log(error.message);
+    }
+}
+
+export const getUser = async (userSessionId) => {
     try {
-        return await api.fetchUser(id);
+        return await api.getUser(userSessionId);
         
       } catch (error) {
         console.log(error.message);
       }
 }
 
-export const createUser = async (user) => {
+export const createUser = async (name, email, password, adress, login) => {
     try {
-        return await api.createUser(user);
+        return await api.createUser(name, email, password, adress, login);
         
       } catch (error) {
         console.log(error.message);
       }
 }
 
-export const updateUser = async (updateUser) => {
+export const updateUser = async (userSessionId, name, email, password, adress, login) => {
     try {
-        return await api.updateUser(updateUser);
+        return await api.updateUser(userSessionId, name, email, password, adress, login);
         
       } catch (error) {
         console.log(error.message);
       }
 }
 
-export const deleteUser = async (userId) => {
+export const deleteUser = async (userSessionId) => {
     try {
-        return await api.deleteUser(userId);
+        return await api.deleteUser(userSessionId);
         
       } catch (error) {
         console.log(error.message);

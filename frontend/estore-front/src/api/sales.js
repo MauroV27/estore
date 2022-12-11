@@ -3,22 +3,22 @@ import { baseURL } from './baseurl';
 
 const sales_url = baseURL + '/sale/'
 
-export const registerSale = (userSessionId) => {
+export const registerSale = async (userSessionId) => {
     //  @param {string} {userSessionId : string}
-    axios.post(sales_url, {userSessionId})
+    return await axios.post(sales_url, {userSessionId})
 };
 
-export const deleteSale = (saleId) => {
+export const deleteSale = async (saleId) => {
     //  @param {number} {saleId : number}
-    axios.delete(sales_url, {saleId})
+    return await axios.delete(sales_url, {saleId})
 };
 
-export const getSale = (saleId) => {
+export const getSale = async (saleId) => {
     //  @param {number} {saleId : number}
-    axios.get(sales_url, {saleId})
+    return await axios.get(sales_url, {saleId})
 };
 
-export const getSalesWithUser = (userId) => {
+export const getSalesWithUser = async (userId) => {
     //  @param {number} createSale={userSessionId : string}
-    axios.get(`${baseURL}/salesFromUser`, {userId})
+    return await axios.get(`${baseURL}/salesFromUser`, {userId})
 };

@@ -1,32 +1,32 @@
 import axios from 'axios';
 import { baseURL } from './baseurl';
 
-export const registerSaleProduct = (saleId, productId, amount) => {
+export const registerSaleProduct = async (saleId, productId, amount) => {
     // @params : { saleId:number, productId:number, amount:number }
-    axios.post(baseURL + '/saleProductRegister/', {saleId, productId, amount})
+    return await axios.post(baseURL + '/saleProductRegister/', {saleId, productId, amount})
 };
 
-export const updateSaleProduct = (saleId, productId, amount) => {
+export const updateSaleProduct = async (saleId, productId, amount) => {
     // @params : { saleId:number, productId:number, amount:number }
-    axios.put(baseURL + '/saleProductUpdate/', {saleId, productId, amount})
+    return await axios.put(baseURL + '/saleProductUpdate/', {saleId, productId, amount})
 };
 
-export const deleteSaleProduct = (saleId, productId) => {
+export const deleteSaleProduct = async (saleId, productId) => {
     // @params : { saleId:number, productId:number }
-    axios.delete(baseURL + '/saleProductDelete/', {saleId, productId})
+    return await axios.delete(baseURL + '/saleProductDelete/', {saleId, productId})
 };
 
-export const getSaleProduct = (saleId, productId) => {
+export const getSaleProduct = async (saleId, productId) => {
     // @params : { saleId:number, productId:number }
-    axios.get(baseURL + '/saleProductOne/', {saleId, productId})
+    return await axios.get(baseURL + '/saleProductOne/', {saleId, productId})
 };
 
-export const getProductsInSale = (saleId) => {
+export const getProductsInSale = async (saleId) => {
     // @params : { saleId:number }
-    axios.get(baseURL + '/productsInSale/', {saleId})
+    return await axios.get(baseURL + '/productsInSale/', {saleId})
 };
 
-export const getSalesWithProduct = (productId) => {
+export const getSalesWithProduct = async (productId) => {
     // @params : { productId:number }
-    axios.get(baseURL + '/salesWithProduct', {productId})
+    return await axios.get(baseURL + '/salesWithProduct', {productId})
 };
