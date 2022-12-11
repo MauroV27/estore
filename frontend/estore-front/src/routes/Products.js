@@ -1,4 +1,6 @@
-/* import React from "react";
+//bandaid pro erro de importação dos produtos
+
+import React from "react";
 // import { useNavigate } from "react-router-dom";
 // import Button from "../../components/Button";
 // import useAuth from "../../hooks/useAuth";
@@ -21,4 +23,4 @@ const Products = () => {
     )
 }
 
-export default Products; */
+export default Products;
